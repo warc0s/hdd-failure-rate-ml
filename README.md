@@ -1,7 +1,5 @@
 # HDD Failure Prediction using Machine Learning
 
-**Marcos García Estévez**
-
 ---
 
 ## Table of Contents
