@@ -8,7 +8,7 @@
 - [Data Collection](#data-collection)
 - [Handling Class Imbalance](#handling-class-imbalance)
 - [Data Cleaning and Preprocessing](#data-cleaning-and-preprocessing)
-  - [Removing Irrelevant Columns](#removing-irrelevant-columns)
+- [Removing Irrelevant Columns](#removing-irrelevant-columns)
   - [Selecting SMART Attributes](#selecting-smart-attributes)
   - [Normalizing Capacity](#normalizing-capacity)
 - [Feature Engineering](#feature-engineering)
