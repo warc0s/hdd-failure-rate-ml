@@ -308,7 +308,7 @@ This project demonstrates the potential of machine learning in predicting HDD fa
 
 ## Acknowledgements
 
-- **Backblaze**: For providing the comprehensive HDD failure dataset.
+- **Backblaze**: For providing the comprehensive HDD failure dataset. You can check it [here](https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data).
 - **Groq**: For facilitating access to Llama 3.1 70B for manufacturer extraction.
 
 ---
