@@ -121,7 +121,7 @@ Eliminate columns that do not contribute to predicting HDD failures:
 12. **smart_198**: Offline uncorrectable sector count.
 13. **smart_199**: UltraDMA CRC error count.
 
-### Step 3.3: Normalizing Capacity
+### Step 4: Normalizing Capacity
 
 - **Issue**: The `capacity_bytes` column contains large values that could disproportionately influence the model.
 - **Solution**:
