@@ -128,7 +128,7 @@ Eliminate columns that do not contribute to predicting HDD failures:
 
 - **Issue**: The `capacity_bytes` column contains large values that could disproportionately influence the model.
 - **Solution**:
-  - Convert `capacity_bytes` to terabytes by dividing by \(1 \times 10^{12}\) and rounding to two decimal places.
+  - Convert `capacity_bytes` to terabytes by dividing by 10^12 and rounding to two decimal places.
   - Create a new column `capacity_terabytes` and remove the original `capacity_bytes`.
 
 ---
