@@ -156,7 +156,7 @@ The `model` column represents the HDD model, which could provide insights into t
   - Store mappings in a dictionary to avoid redundant API calls and improve efficiency.
   - Assign a generic manufacturer label for unrecognized models.
 
-> **Note**: This step was ultimately unnecessary, as the LLM (Llama 3.1 70B) successfully extracted the manufacturer for all HDDs.
+> **Note**: This last point was ultimately unnecessary, as the LLM (Llama 3.1 70B) successfully extracted the manufacturer for all HDDs.
 
 ### Step 6: Encoding Manufacturer Information
 
