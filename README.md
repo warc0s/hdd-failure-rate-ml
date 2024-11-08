@@ -36,10 +36,18 @@ The dataset used in this project is provided by [Backblaze](https://www.backblaz
 - **Failure**: Binary indicator (0 for operational, 1 for failure).
 - **SMART Attributes**: 124 columns representing raw and normalized values across 62 different SMART statistics.
 
+---
+
+## Note
+
+In this README, I will provide a quick overview of the steps followed to achieve the best machine learning model for this project. For a more detailed explanation or to review the code used, please refer to the accompanying Jupyter notebook (`.ipynb`).
+
+---
+
 ### Step 1: Data Acquisition
 
 1. **Download and Extract Data**: 
-   - Download ZIP files containing the first two quarters of 2024 data.
+   - Download ZIP files containing data from 2018 to the first two quarters of 2024.
    - Extract the CSV files into a single directory for easier access.
 
 2. **Inspect Columns**:
@@ -49,7 +57,7 @@ The dataset used in this project is provided by [Backblaze](https://www.backblaz
 
 ## Handling Class Imbalance
 
-The dataset exhibits a significant class imbalance, with approximately 0.75% of the HDDs failing. Specifically, daily failures range between 8-13 out of over 280,000 operational drives.
+The dataset exhibits a significant class imbalance, as selecting a random day's CSV file for training would show that only about 5-10 HDDs fail each day, out of a large number of operational drives. This means that on any given day, failures are relatively rare, leading to a highly imbalanced dataset.
 
 ### Step 2.1: Daily Failures Review
 
@@ -58,15 +66,15 @@ The dataset exhibits a significant class imbalance, with approximately 0.75% of 
 
 ### Step 2.2: Aggregating Failures
 
-- **Script Development**: Create a script to iterate through 183 CSV files, extracting only the rows where HDDs failed.
-- **Dataset Consolidation**: Combine these failure records with the latest CSV (184th) to form a more balanced dataset.
+- **Script Development**: Create a script to iterate through all CSV files, extracting only the rows where HDDs failed.
+- **Dataset Consolidation**: Combine these failure records with the latest CSV from June 30 to form a more balanced dataset.
 
 ### Step 2.3: Merging CSVs
 
 - **Final Dataset**: Merge `CSV_fallos.csv` with the June 30th CSV to create `dataset.csv`.
 - **Shuffle and Relocate**: Shuffle the combined dataset and move it to the root directory for ease of access.
 
-**Result**: Approximately 2,200 failed HDDs (~0.75% of the total dataset).
+**Result**: Approximately 17,000 failed HDDs (~5.54% of the total dataset).
 
 ---
 
@@ -136,7 +144,7 @@ The `model` column represents the HDD model, which could provide insights into t
 - **Cons**:
   - Limited utility for predicting HDD models not present in the training set.
 
-**Solution**: Implement a hybrid approach by extracting the `manufacturer` from the `model` using a Large Language Model (LLM) like Llama 3.1 70B. This allows the model to generalize better across different HDD models by focusing on the manufacturer.
+**Solution**: Implement a hybrid approach by extracting the `manufacturer` from the `model` using a Large Language Model (LLM) like Llama 3.1 70B (thanks to Groq for its free tier, which made this possible). This allows the model to generalize better across different HDDs by focusing on the manufacturer, enabling a broader scope than using specific model details.
 
 ### Step 5.2: Automating Manufacturer Extraction
 
@@ -145,16 +153,18 @@ The `model` column represents the HDD model, which could provide insights into t
   - Store mappings in a dictionary to avoid redundant API calls and improve efficiency.
   - Assign a generic manufacturer label for unrecognized models.
 
+> **Note**: This step was ultimately unnecessary, as the LLM (Llama 3.1 70B) successfully extracted the manufacturer for all HDDs.
+
 ### Step 6: Encoding Manufacturer Information
 
-Convert the `manufacturer` categorical data into numerical format to be usable by machine learning algorithms.
+Convert the `manufacturer` categorical data into a numerical format to make it usable by machine learning algorithms.
 
 - **One-Hot Encoding**:
-  - Create binary columns for each manufacturer.
+  - Transform each manufacturer into a binary column.
   - Advantages:
-    - No implicit ordering.
-    - Treats manufacturers as independent categories.
-  - Allows for the inclusion of unknown manufacturers by setting all manufacturer columns to 0.
+    - Avoids imposing any order on manufacturers.
+    - Treats each manufacturer as an independent category.
+  - Chose this method for its flexibility, allowing unknown manufacturers to be represented by setting all columns to 0.
 
 ---
 
@@ -170,12 +180,11 @@ With a cleaned and preprocessed dataset, the next step is to train machine learn
   - Ensures class proportion is maintained in both sets.
 
 - **Hyperparameter Tuning**:
-  - **GridSearchCV** (commented out for local execution):
+  - **GridSearchCV**:
     - `n_estimators`: [100, 200, 300]
     - `max_depth`: [10, 20, 30]
     - `min_samples_split`, `min_samples_leaf`: Optimized for generalization.
     - `max_features`: ['sqrt', 'log2']
-  - **Best Parameters**: Manually assigned post GridSearchCV due to computational constraints.
 
 - **Objective**: Maximize the F1-Score for the minority class to balance precision and recall.
 
@@ -185,7 +194,7 @@ With a cleaned and preprocessed dataset, the next step is to train machine learn
   - Consistent with Random Forest for fair comparison.
 
 - **Hyperparameter Tuning**:
-  - **GridSearchCV** (commented out for local execution):
+  - **GridSearchCV**:
     - `n_estimators`: [100, 200, 300]
     - `max_depth`: [3, 6, 10]
     - `learning_rate`: [0.01, 0.1, 0.2]
@@ -205,19 +214,39 @@ Visualizes the performance of both models by showing the true positives, true ne
 
 ### Step 8.2: Classification Report
 
-Provides detailed metrics including precision, recall, and F1-Score for each class, offering deeper insights into model performance.
+### Classification Report for XGBoost:
+
+| Class     | Precision | Recall | F1-Score | Support |
+|-----------|-----------|--------|----------|---------|
+| No Failure  | 0.98      | 0.99   | 0.99     | 27960   |
+| Failure     | 0.88      | 0.70   | 0.78     | 1630    |
+| Accuracy |         |        | 0.98 | 29590   |
+| Macro Avg | 0.93      | 0.85   | 0.89     | 29590   |
+| Weighted Avg | 0.98   | 0.98   | 0.98     | 29590   |
+
+---
+
+### Classification Report for RandomForest:
+
+| Class     | Precision | Recall | F1-Score | Support |
+|-----------|-----------|--------|----------|---------|
+| No Failure  | 0.98      | 0.99   | 0.99     | 27960   |
+| Failure     | 0.88      | 0.70   | 0.78     | 1630    |
+| Accuracy |         |        | 0.98 | 29590   |
+| Macro Avg | 0.93      | 0.85   | 0.89     | 29590   |
+| Weighted Avg | 0.98   | 0.98   | 0.98     | 29590   |
 
 ### Step 8.3: Feature Importance
 
 Analyzes which features are most influential in predicting HDD failures for each model.
 
 - **Random Forest**:
-  - Focuses on `smart_9` (Power-on hours) and `smart_1` (Read error rate).
+  - Focuses on `smart_9` (Power-on hours).
 
 - **XGBoost**:
-  - Prioritizes `smart_197` (Current pending sector count).
+  - Prioritizes `smart_198` (Offline uncorrectable sector count), `smart_199` (UltraDMA CRC error count), and `smart_5` (Reallocated sector count).
 
-This indicates that Random Forest emphasizes the age of the HDD, while XGBoost focuses more on physical failure indicators.
+This indicates that Random Forest emphasizes the age of the HDD, while XGBoost focuses more on physical failure indicators, despite both having almost the same performance.
 
 ### Step 8.4: Threshold Adjustment
 
@@ -228,8 +257,12 @@ Adjusts the decision threshold from the default 50% to optimize the F1-Score and
   - Select the threshold that maximizes the F1-Score, with a preference for higher recall in case of ties.
 
 - **Results**:
-  - **Random Forest**: Improved F1-Score by 11 points.
-  - **XGBoost**: Achieved a higher F1-Score compared to Random Forest.
+Both models achieved a one-point increase in their F1-Score, with improvements in recall coming at a slight cost to precision.
+
+- **Random Forest**: Showed a slightly higher recall, making it marginally better at identifying failures.
+- **XGBoost**: Exhibited a slightly higher precision, indicating it was marginally more accurate in its positive predictions.
+
+Each model thus demonstrated a very slight advantage in either recall (Random Forest) or precision (XGBoost), highlighting their respective strengths.
 
 ---
 
@@ -242,30 +275,32 @@ Combining the strengths of both Random Forest and XGBoost models through weighte
   - Experiment with various weight combinations and thresholds.
   - Identify the best combinations to maximize F1-Score, precision, and recall.
 
-- **Best Combinations**:
-  - **Maximize F1-Score**: XGBoost (0.56), Random Forest (0.44), Threshold: 25%
-  - **Maximize Precision**: XGBoost (0.47), Random Forest (0.53), Threshold: 88%
-  - **Maximize Recall**: XGBoost (0.04), Random Forest (0.96), Threshold: 10%
+- **Best Ensemble Combinations**:
+  - **Maximize F1-Score**: XGBoost (0.47), Random Forest (0.53), Threshold: 37%
+  - **Maximize Precision**: XGBoost (0.34), Random Forest (0.66), Threshold: 90%
+  - **Maximize Recall**: XGBoost (0.23), Random Forest (0.77), Threshold: 10%
+ 
+![Ensemble](https://github.com/warc0s/hdd-failure-rate-ml/blob/main/images/Ensemble.png?raw=true)
 
 These combinations provide a balanced approach to handling different aspects of model performance, allowing for a more robust final prediction system.
 
 ---
 
-## Implementation and Usage
+## Implementation and Usage - Tests
 
 The final implementation leverages the ensemble of both models with optimized weights and thresholds to predict HDD failures. The process involves:
 
-1. **Selecting Disks**: Randomly select HDDs from the test set, ensuring at least one has failed.
+1. **Selecting Disks**: Randomly select HDDs from the test set, ensuring at least one has failed for testing purposes.
 2. **Applying Ensemble Logic**:
    - **F1-Oriented**: High accuracy in predicting failures.
    - **Precision-Oriented**: Identifies critical failures with high precision.
    - **Recall-Oriented**: Maximizes the detection of actual failures, albeit with some false positives.
 3. **Decision Making**:
    - Utilize a series of conditional checks to determine the final prediction based on the ensemble outputs.
-   - Provide actionable alerts based on the combination of model predictions.
+   - Provide actionable alerts (prints) based on the combination of model predictions.
 
 **Usage Example**:
-Run the provided script to evaluate randomly selected HDDs and observe the ensemble-based predictions, validating the model's real-world applicability.
+![Real Usage Image](https://github.com/warc0s/hdd-failure-rate-ml/blob/main/images/real_usage.png?raw=true)
 
 ---
 
@@ -277,21 +312,17 @@ Run the provided script to evaluate randomly selected HDDs and observe the ensem
 - **Threshold Optimization**: Adjusting decision thresholds significantly improves the model’s ability to balance precision and recall.
 - **Feature Selection**: Focusing on critical SMART attributes enhances model performance by reducing noise.
 
-### Areas for Improvement
-
-1. **Expand Failure Data**: Incorporate historical failure data from previous years to increase the minority class representation.
-2. **Implement SMOTE**: Apply Synthetic Minority Over-sampling Technique to further address class imbalance.
-3. **Temporal Features**: Analyze SMART attributes over a time window (e.g., last 10 days) to capture trends leading to failure.
-4. **Re-evaluate SMART Attributes**: Investigate additional SMART attributes with low missing rates for potential inclusion.
-5. **Add More Models**: Integrate additional algorithms like LightGBM or SVM to capture different data patterns.
-6. **Train Meta-Model**: Develop a meta-model that learns from the predictions of individual models for enhanced accuracy.
-7. **Advanced Neural Networks**: Explore deep learning architectures to model complex relationships between features.
-8. **Model-Specific Training**: Train separate models for different HDD models to capture model-specific failure patterns.
-9. **One-Hot Encoding for Models**: Instead of manufacturers, encode HDD models to preserve detailed information.
-
 ### Final Thoughts
 
-This project demonstrates the potential of machine learning in predicting HDD failures, offering a foundation for more advanced predictive maintenance systems. By implementing the suggested improvements, the model's accuracy and reliability can be further enhanced, making it a valuable tool for data center operations.
+This project highlights the effectiveness of machine learning in predicting HDD failures, setting a solid foundation for future, more sophisticated predictive maintenance systems.
+
+As seen in the previous step, the combination of weights and thresholds for the two trained models **performed surprisingly well**—far better than I anticipated.
+
+Initially, I aimed to select a single model, most likely XGBoost, as it's known for reliable performance in similar contexts. My plan was to classify HDDs based on the model's confidence in predicting failure, using labels like 'minor issue, monitor' or 'critical alert, backup recommended.'
+
+However, after plotting the feature importance for each model and observing their different prioritizations, I reconsidered and explored the idea of "blending" the models. I researched various methods for this and discovered **Weighted Ensemble Stacking** with threshold optimization, which is effective for combining model outputs with adjusted importance. The final result, as seen above, achieves a balanced performance, which I find impressive for a first large-scale ML project.
+
+Finally, this project shows promising potential. By focusing on manufacturers rather than specific models and using one-hot encoding, the model could operate with all manufacturer columns set to zero and still perform reliably—placing greater emphasis on SMART attributes. In essence, this is a **universal model** that can generalize across any HDD, making it versatile for broader applications.
 
 ---
 
@@ -308,4 +339,4 @@ This project is licensed under the Apache2 License.
 
 ---
 
-*Thank you for taking the time to explore this project! Feel free to reach out with any questions or suggestions.*
+*Thank you for taking the time to explore this project! Feel free to reach out with any questions or suggestions :)*
