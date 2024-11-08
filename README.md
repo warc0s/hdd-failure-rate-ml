@@ -323,7 +323,7 @@ As seen in the previous step, the combination of weights and thresholds for the 
 
 Initially, I aimed to select a single model, most likely XGBoost, as it's known for reliable performance in similar contexts. My plan was to classify HDDs based on the model's confidence in predicting failure, using labels like 'minor issue, monitor' or 'critical alert, backup recommended.'
 
-However, after plotting the feature importance for each model and observing their different prioritizations, I reconsidered and explored the idea of "blending" the models. I researched various methods for this and discovered **Weighted Ensemble Stacking** with threshold optimization, which is effective for combining model outputs with adjusted importance. The final result, as seen above, achieves a balanced performance, which I find impressive for a first large-scale ML project.
+However, after plotting the feature importance for each model and observing their different prioritizations, I reconsidered and explored the idea of "blending" the models. I researched various methods for this and discovered **Weighted Ensemble Stacking** with threshold optimization, which is effective for combining model outputs with adjusted importance. The final result, as seen above, achieves a balanced performance, which is impressive for my first ML project at this scale.
 
 Finally, this project shows promising potential. By focusing on manufacturers rather than specific models and using one-hot encoding, the model could operate with all manufacturer columns set to zero and still perform reliably—placing greater emphasis on SMART attributes. In essence, this is a **universal model** that can generalize across any HDD, making it versatile for broader applications.
 
