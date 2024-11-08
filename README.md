@@ -41,8 +41,9 @@ The dataset used in this project is provided by [Backblaze](https://www.backblaz
 ## Notes
 
 1. In this README, I will provide a quick overview of the steps followed to achieve the best machine learning model for this project. For a more detailed explanation or to review the code used, please refer to the accompanying Jupyter notebook (`.ipynb`).
-
 2. The RandomForest model is not included here as its file size exceeds 25MB. If anyone would like to access it, they can either run the training code provided or request it from me via email or LinkedIn.
+3. There is also a 10-minute video in Spanish explaining this project. However, please note that the values shown in the video are different, as it was based on the initial trial. The models and code in this repository are from the second version, with improved values. [Project Explanation Video (Spanish)](https://www.youtube.com/watch?v=jqhft3HSQkY)
+
 
 ---
 
