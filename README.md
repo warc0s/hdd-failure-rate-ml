@@ -256,7 +256,7 @@ This indicates that Random Forest emphasizes the age of the HDD, while XGBoost f
 Adjusts the decision threshold from the default 50% to optimize the F1-Score and recall.
 
 - **Approach**:
-  - Test thresholds from 10% to 90% in 1% increments.
+  - Test thresholds from 10% to 90% in 0.5% increments.
   - Select the threshold that maximizes the F1-Score, with a preference for higher recall in case of ties.
 
 - **Results**:
