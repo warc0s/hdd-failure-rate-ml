@@ -342,4 +342,4 @@ This project is licensed under the Apache2 License.
 
 ---
 
-*Thank you for taking the time to explore this project! Feel free to reach out with any questions or suggestions :)*
+*Thank you for taking the time to explore my project! Feel free to reach out with any questions or suggestions :)*
